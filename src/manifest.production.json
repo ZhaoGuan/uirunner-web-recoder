@@ -1,0 +1,43 @@
+{
+    "manifest_version": 3,
+    "name": "WebRecoding",
+    "description": "WebRecoding",
+    "version": "0.0.1",
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "action": {
+        "default_icon": "icons/default-64.png",
+        "default_title": "Click on any element to get the xPath"
+    },
+    "commands": {
+        "toggle-xpath": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+U",
+                "mac": "Command+Shift+U"
+            },
+            "description": "Toggle plugin"
+        }
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "scripting",
+        "activeTab",
+        "enterprise"
+    ],
+    "host_permissions": [
+        "*://*/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}
