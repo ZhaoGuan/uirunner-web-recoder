@@ -1,7 +1,7 @@
 const tabs = {};
 const inspectFile = 'content.js';
-// const serviceHost = "http://0.0.0.0:8888"
-const serviceHost = "http://host.docker.internal:8888"
+const serviceHost = "http://0.0.0.0:8888"
+// const serviceHost = "http://host.docker.internal:8888"
 
 //TODO 去掉icon逻辑
 const inspect = {

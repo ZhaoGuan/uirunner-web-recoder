@@ -332,22 +332,14 @@ var xPathFinder = xPathFinder || (() => {
             inspect.deactivate();
         }
     })
-    // chrome.runtime.onMessage.addListener(() => {
-    //     document.addEventListener("mousemove", () => {
-    //         const recording = localStorage.getItem("recording")
-    //         if (recording === 'true') {
-    //             console.log("!!!!!!")
-    //             inspect.getOptions();
-    //         } else {
-    //             inspect.deactivate();
-    //         }
-    //     })
-    // });
-    // chrome.runtime.onMessage.addListener(request => {
-    //     if (request.action === 'activate') {
-    //         return inspect.getOptions();
-    //     }
-    //     return inspect.deactivate();
-    // });
+
+    chrome.runtime.onMessage.addListener(request => {
+        if (request.action === 'activate') {
+            localStorage.setItem("recording", "true")
+            return inspect.getOptions();
+        }
+        localStorage.setItem("recording", "false")
+        return inspect.deactivate();
+    });
     return true;
 })();
