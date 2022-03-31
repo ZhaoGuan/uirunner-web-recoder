@@ -18,16 +18,16 @@ var xPathFinder = xPathFinder || (() => {
             e.stopImmediatePropagation();
             e.preventDefault && e.preventDefault();
             e.stopPropagation && e.stopPropagation();
-
             if (e.target.id !== this.contentNode) {
+                const x = e.clientX
+                const y = e.clientY
                 this.XPath = this.getXPath(e.target);
                 const dockerName = localStorage.getItem("dockerName")
-                chrome.storage.sync.set({xpath: null, dockerName: null});
-                chrome.storage.sync.set({xpath: this.XPath, dockerName: dockerName});
+                chrome.storage.sync.set({xpath: null, dockerName: null, location: null});
+                chrome.storage.sync.set({xpath: this.XPath, dockerName: dockerName, location: {x: x, y: y}});
                 const contentNode = document.getElementById(this.contentNode);
                 const iframeNode = window.frameElement || iframe;
                 const contentString = iframeNode ? `Iframe: ${this.getXPath(iframeNode)}<br/>XPath: ${this.XPath}` : this.XPath;
-
                 if (contentNode) {
                     contentNode.innerHTML = contentString;
                 } else {
@@ -129,10 +129,8 @@ var xPathFinder = xPathFinder || (() => {
             const node = e.target;
             if (node.id !== this.contentNode) {
                 this.removeOverlay();
-
                 const box = this.getNestedBoundingClientRect(node, this.win);
                 const dimensions = this.getElementDimensions(node);
-
                 this.boxWrap(dimensions, 'margin', this.node);
                 this.boxWrap(dimensions, 'border', this.border);
                 this.boxWrap(dimensions, 'padding', this.padding);
@@ -166,9 +164,14 @@ var xPathFinder = xPathFinder || (() => {
             this.options.inspector && (document.addEventListener('mouseover', this.draw));
             const frameLength = window.parent.frames.length
             for (let i = 0; i < frameLength; i++) {
-                let frame = window.parent.frames[i];
-                frame.document.addEventListener('click', e => this.getData(e, frame.frameElement), true);
-                this.options.inspector && (frame.document.addEventListener('mouseover', this.draw));
+                try {
+                    let frame = window.parent.frames[i];
+                    frame.document.addEventListener('click', e => this.getData(e, frame.frameElement), true);
+                    this.options.inspector && (frame.document.addEventListener('mouseover', this.draw));
+                    // eslint-disable-next-line no-empty
+                } catch (e) {
+                }
+
             }
 
         }
@@ -187,9 +190,14 @@ var xPathFinder = xPathFinder || (() => {
             this.options && this.options.inspector && (document.removeEventListener('mouseover', this.draw));
             const frameLength = window.parent.frames.length
             for (let i = 0; i < frameLength; i++) {
-                let frameDocument = window.parent.frames[i].document
-                frameDocument.removeEventListener('click', this.getData, true);
-                this.options && this.options.inspector && (frameDocument.removeEventListener('mouseover', this.draw));
+                try {
+                    let frameDocument = window.parent.frames[i].document
+                    frameDocument.removeEventListener('click', this.getData, true);
+                    this.options && this.options.inspector && (frameDocument.removeEventListener('mouseover', this.draw));
+                    // eslint-disable-next-line no-empty
+                } catch (e) {
+                }
+
             }
 
         }
@@ -334,6 +342,7 @@ var xPathFinder = xPathFinder || (() => {
     })
 
     chrome.runtime.onMessage.addListener(request => {
+        console.log(request.action)
         if (request.action === 'activate') {
             localStorage.setItem("recording", "true")
             return inspect.getOptions();

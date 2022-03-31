@@ -1,7 +1,7 @@
 const tabs = {};
 const inspectFile = 'content.js';
-const serviceHost = "http://0.0.0.0:8888"
-// const serviceHost = "http://host.docker.internal:8888"
+// const serviceHost = "http://0.0.0.0:8888"
+const serviceHost = "http://host.docker.internal:8888"
 
 //TODO 去掉icon逻辑
 const inspect = {
@@ -62,7 +62,7 @@ function getActiveTab() {
 
 //TODO socketIO 替代数据传递
 // eslint-disable-next-line
-function reportXpathData(xpathData, dockerName) {
+function reportXpathData(xpathData, dockerName, location) {
     // TODO 这个是Docker的host
     const Url = `${serviceHost}/web-docker/recording`;
     fetch(Url, {
@@ -70,7 +70,7 @@ function reportXpathData(xpathData, dockerName) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({xpathData: xpathData, dockerName: dockerName})
+        body: JSON.stringify({xpathData: xpathData, dockerName: dockerName, location: location})
     }).then(rep => {
         console.log(rep)
     })
@@ -119,6 +119,7 @@ chrome.action.onClicked.addListener(tab => {
 chrome.storage.onChanged.addListener((changes) => {
     let xpath = null
     let dockerName = null
+    let location = null
     for (let [key, {newValue}] of Object.entries(changes)) {
         if (key === 'xpath') {
             xpath = newValue
@@ -126,9 +127,12 @@ chrome.storage.onChanged.addListener((changes) => {
         if (key === 'dockerName') {
             dockerName = newValue
         }
+        if (key === 'location') {
+            location = newValue
+        }
     }
     if (dockerName && xpath) {
-        reportXpathData(xpath, dockerName)
+        reportXpathData(xpath, dockerName, location)
     }
 
 });
