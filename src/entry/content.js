@@ -22,12 +22,19 @@ var xPathFinder = xPathFinder || (() => {
                 const x = e.clientX
                 const y = e.clientY
                 this.XPath = this.getXPath(e.target);
-                const dockerName = localStorage.getItem("dockerName")
-                chrome.storage.sync.set({xpath: null, dockerName: null, location: null});
-                chrome.storage.sync.set({xpath: this.XPath, dockerName: dockerName, location: {x: x, y: y}});
                 const contentNode = document.getElementById(this.contentNode);
                 const iframeNode = window.frameElement || iframe;
                 const contentString = iframeNode ? `Iframe: ${this.getXPath(iframeNode)}<br/>XPath: ${this.XPath}` : this.XPath;
+                const iframeXpath = iframeNode ? this.getXPath(iframeNode) : null;
+                console.log('iframe', iframeXpath)
+                const dockerName = localStorage.getItem("dockerName")
+                chrome.storage.sync.set({xpath: null, dockerName: null, location: null, iframe: null});
+                chrome.storage.sync.set({
+                    xpath: this.XPath,
+                    dockerName: dockerName,
+                    location: {x: x, y: y},
+                    iframe: iframeXpath
+                });
                 if (contentNode) {
                     contentNode.innerHTML = contentString;
                 } else {

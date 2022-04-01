@@ -62,7 +62,7 @@ function getActiveTab() {
 
 //TODO socketIO 替代数据传递
 // eslint-disable-next-line
-function reportXpathData(xpathData, dockerName, location) {
+function reportXpathData(xpathData, dockerName, location, iframe) {
     // TODO 这个是Docker的host
     const Url = `${serviceHost}/web-docker/recording`;
     fetch(Url, {
@@ -70,7 +70,7 @@ function reportXpathData(xpathData, dockerName, location) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({xpathData: xpathData, dockerName: dockerName, location: location})
+        body: JSON.stringify({xpathData: xpathData, dockerName: dockerName, location: location, iframe: iframe})
     }).then(rep => {
         console.log(rep)
     })
@@ -120,6 +120,7 @@ chrome.storage.onChanged.addListener((changes) => {
     let xpath = null
     let dockerName = null
     let location = null
+    let iframe = null
     for (let [key, {newValue}] of Object.entries(changes)) {
         if (key === 'xpath') {
             xpath = newValue
@@ -130,9 +131,12 @@ chrome.storage.onChanged.addListener((changes) => {
         if (key === 'location') {
             location = newValue
         }
+        if (key === 'iframe') {
+            iframe = newValue
+        }
     }
     if (dockerName && xpath) {
-        reportXpathData(xpath, dockerName, location)
+        reportXpathData(xpath, dockerName, location, iframe)
     }
 
 });
